@@ -1,0 +1,191 @@
+{% extends "base.html" %}
+
+{% block title %}{{ file.title }} - Community File Sharing{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Back Button -->
+    <div class="row mb-3">
+        <div class="col-12">
+            <a href="{% url 'downloads' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>
+                Back to Downloads
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <!-- File Header -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-2 text-center">
+                            {% if file.file_type in 'apk exe' %}
+                                <i class="fas fa-mobile-alt fa-4x text-primary"></i>
+                            {% elif file.file_type in 'zip rar 7z' %}
+                                <i class="fas fa-file-archive fa-4x text-warning"></i>
+                            {% elif file.file_type == 'pdf' %}
+                                <i class="fas fa-file-pdf fa-4x text-danger"></i>
+                            {% elif file.file_type in 'mp3 wav ogg' %}
+                                <i class="fas fa-music fa-4x text-success"></i>
+                            {% else %}
+                                <i class="fas fa-file fa-4x text-secondary"></i>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-10">
+                            <h1 class="mb-2">{{ file.title }}</h1>
+                            <p class="text-muted mb-2">{{ file.description }}</p>
+                            <div class="d-flex flex-wrap align-items-center gap-3">
+                                <span class="badge bg-primary">{{ file.file_type|upper }}</span>
+                                <span class="badge bg-secondary">{{ file.category|title }}</span>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    Uploaded {{ file.upload_date|timesince }} ago
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Stats -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-4">
+                            <div class="mb-2">
+                                <i class="fas fa-download fa-2x text-primary"></i>
+                            </div>
+                            <h4>{{ file.download_count }}</h4>
+                            <small class="text-muted">Downloads</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-2">
+                                <i class="fas fa-heart fa-2x text-danger"></i>
+                            </div>
+                            <h4 id="like-count">{{ file.like_count }}</h4>
+                            <small class="text-muted">Likes</small>
+                        </div>
+                        <div class="col-4">
+                            <div class="mb-2">
+                                <i class="fas fa-users fa-2x text-info"></i>
+                            </div>
+                            <h4>{{ file.rating_count }}</h4>
+                            <small class="text-muted">Reviews</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Version History -->
+            {% if versions %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Version History
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% for version in versions %}
+                    <div class="border-bottom pb-3 mb-3">
+                        <div class="d-flex justify-content-between align-items-start">
+                            <div>
+                                <h6 class="mb-1">Version {{ version.version }}</h6>
+                                <p class="text-muted mb-1">{{ version.changelog|default:"No changelog provided" }}</p>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar me-1"></i>
+                                    {{ version.upload_date|date:"F d, Y" }}
+                                    <i class="fas fa-download ms-3 me-1"></i>
+                                    {{ version.download_count }} downloads
+                                    <i class="fas fa-weight ms-3 me-1"></i>
+                                    {{ version.file_size|filesizeformat }}
+                                </small>
+                            </div>
+                            <a href="{% url 'download_file' file.id %}" class="btn btn-sm btn-outline-primary">
+                                Download
+                            </a>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Download Section -->
+            <div class="card mb-4">
+                <div class="card-body text-center">
+                    <h5 class="card-title">Download File</h5>
+                    <p class="text-muted">Current Version: {{ file.version }}</p>
+                    <p class="text-muted">Size: {{ file.file_size|filesizeformat }}</p>
+                    
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'download_file' file.id %}" class="btn btn-success btn-lg">
+                            <i class="fas fa-download me-2"></i>
+                            Download Now
+                        </a>
+                        
+                        <!-- LIKE BUTTON: DUMMY -->
+                        <button type="button" class="btn btn-outline-danger" id="like-btn">
+                            <i class="fas fa-heart me-2"></i> Like
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- File Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="mb-0">File Information</h6>
+                </div>
+                <div class="card-body">
+                    <table class="table table-sm">
+                        <tr>
+                            <td><strong>File Name:</strong></td>
+                            <td>{{ file.original_filename }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Type:</strong></td>
+                            <td>{{ file.file_type|upper }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Category:</strong></td>
+                            <td>{{ file.category|title }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Size:</strong></td>
+                            <td>{{ file.file_size|filesizeformat }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Uploader:</strong></td>
+                            <td>{{ file.uploader.username }}</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Upload Date:</strong></td>
+                            <td>{{ file.upload_date|date:"F d, Y" }}</td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Dummy Like button functionality (NO BACKEND CALL)
+document.getElementById('like-btn').addEventListener('click', function() {
+    const btn = this;
+    let currentLikes = parseInt(document.getElementById('like-count').textContent);
+    currentLikes += 1;
+    document.getElementById('like-count').textContent = currentLikes;
+    btn.disabled = true; // Disable after fake like
+});
+</script>
+{% endblock %}

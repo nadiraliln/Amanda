@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Downloads - Community File Sharing{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Header Section -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="mb-3">
+                <i class="fas fa-download me-2"></i>
+                Downloads
+            </h1>
+
+            <!-- Search and Filter -->
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                        <input type="text" class="form-control" name="search" placeholder="Search files..." value="{{ request.GET.search }}">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <select class="form-select" name="category">
+                        <option value="">All Categories</option>
+                        {% for cat in categories %}
+                        <option value="{{ cat }}" {% if cat == current_category %}selected{% endif %}>{{ cat|title }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">Filter</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Files Grid -->
+    <div class="row">
+        {% for file in files %}
+        <div class="col-md-6 col-lg-4 col-xl-3 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <!-- File Type Icon -->
+                    <div class="text-center mb-3">
+                        {% if file.file_type in 'apk exe' %}
+                            <i class="fas fa-mobile-alt fa-3x text-primary"></i>
+                        {% elif file.file_type in 'zip rar 7z' %}
+                            <i class="fas fa-file-archive fa-3x text-warning"></i>
+                        {% elif file.file_type == 'pdf' %}
+                            <i class="fas fa-file-pdf fa-3x text-danger"></i>
+                        {% elif file.file_type in 'mp3 wav ogg' %}
+                            <i class="fas fa-music fa-3x text-success"></i>
+                        {% else %}
+                            <i class="fas fa-file fa-3x text-secondary"></i>
+                        {% endif %}
+                    </div>
+
+                    <!-- File Info -->
+                    <h6 class="card-title">{{ file.title }}</h6>
+                    <p class="card-text small text-muted">
+                        {{ file.description|truncatechars:60 }}
+                    </p>
+
+                    <!-- File Meta -->
+                    <div class="mb-3">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">
+                                <i class="fas fa-tag me-1"></i>
+                                {{ file.category|title }}
+                            </small>
+                            <span class="badge bg-secondary">{{ file.file_type|upper }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <small class="text-muted">
+                                <i class="fas fa-download me-1"></i>
+                                {{ file.download_count }}
+                            </small>
+                            <small class="text-muted">
+                                <i class="fas fa-heart me-1"></i>
+                                {{ file.like_count }}
+                            </small>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <small class="text-muted">
+                                <i class="fas fa-star me-1"></i>
+                                {{ file.average_rating|floatformat:1 }}
+                            </small>
+                            <small class="text-muted">
+                                {{ file.file_size|filesizeformat }}
+                            </small>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer">
+                    <a href="{% url 'file_detail' file.id %}" class="btn btn-primary w-100">
+                        <i class="fas fa-eye me-2"></i>
+                        View Details
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12">
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4>No files found</h4>
+                <p class="text-muted">Try adjusting your search or filter criteria</p>
+                <a href="{% url 'downloads' %}" class="btn btn-primary">
+                    <i class="fas fa-refresh me-2"></i>
+                    Show All Files
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    {% if files.has_other_pages %}
+    <div class="row mt-4">
+        <div class="col-12">
+            <nav aria-label="Page navigation">
+                <ul class="pagination justify-content-center">
+                    {% if files.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ files.previous_page_number }}&category={{ current_category }}&search={{ request.GET.search }}">Previous</a>
+                    </li>
+                    {% endif %}
+
+                    {% for page_num in files.paginator.page_range %}
+                        {% if page_num == files.number %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_num }}</span>
+                        </li>
+                        {% else %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ page_num }}&category={{ current_category }}&search={{ request.GET.search }}">{{ page_num }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% if files.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ files.next_page_number }}&category={{ current_category }}&search={{ request.GET.search }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+
+{% block title %}Unique Creators{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <!-- Welcome Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="bg-primary bg-gradient p-4 rounded text-white">
+                <h1 class="display-4 fw-bold">Welcome to Unique Creators</h1>
+                <p class="lead">Discover and share amazing content from talented creators around the world.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Creators Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <h2 class="mb-4">
+                <i class="fas fa-users me-2"></i>
+                Featured Creators
+            </h2>
+            <div class="row">
+                {% for creator in creators %}
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center me-3" style="width: 50px; height: 50px;">
+                                    <i class="fas fa-user text-white"></i>
+                                </div>
+                                <div>
+                                    <h5 class="card-title mb-0">{{ creator.name }}</h5>
+                                    <small class="text-muted">{{ creator.specialty }}</small>
+                                </div>
+                            </div>
+                            <p class="card-text">{{ creator.description }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No creators found.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Files Section -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>
+                    <i class="fas fa-clock me-2"></i>
+                    Recent Uploads
+                </h2>
+                <a href="{% url 'downloads' %}" class="btn btn-outline-primary">
+                    View All <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+            <div class="row">
+                {% for file in recent_files %}
+                <div class="col-md-6 col-lg-3 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center mb-2">
+                                <i class="fas fa-file-alt me-2 text-primary"></i>
+                                <span class="badge bg-secondary">{{ file.file_type }}</span>
+                            </div>
+                            <h6 class="card-title">{{ file.title }}</h6>
+                            <p class="card-text small text-muted">
+                                {{ file.description|truncatechars:80 }}
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="fas fa-download me-1"></i>
+                                    {{ file.download_count }}
+                                </small>
+                                <a href="{% url 'file_detail' file.id %}" class="btn btn-sm btn-primary">View</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <p>No recent files uploaded.</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-users fa-2x text-primary mb-3"></i>
+                    <h4>{{ creators|length }}</h4>
+                    <p class="mb-0">Active Creators</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-file fa-2x text-success mb-3"></i>
+                    <h4>{{ recent_files|length }}+</h4>
+                    <p class="mb-0">Files Available</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="fas fa-download fa-2x text-info mb-3"></i>
+                    <h4>1000+</h4>
+                    <p class="mb-0">Downloads</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

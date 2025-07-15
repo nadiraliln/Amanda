@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+
+{% block title %}About - Community File Sharing{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <!-- Hero Section -->
+            <div class="text-center mb-5">
+                <i class="fas fa-cloud-download-alt fa-4x text-primary mb-3"></i>
+                <h1 class="display-4 fw-bold mb-3">About Community Files</h1>
+                <p class="lead text-muted">A platform built by creators, for creators</p>
+            </div>
+
+            <!-- Mission Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-bullseye me-2 text-primary"></i>
+                        Our Mission
+                    </h3>
+                    <p class="card-text">
+                        Community Files is dedicated to creating a safe, reliable, and user-friendly platform where 
+                        creators can share their work with the world. We believe in empowering independent developers, 
+                        artists, musicians, and content creators by providing them with the tools they need to reach 
+                        their audience.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Features Section -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-star me-2 text-warning"></i>
+                        What We Offer
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-shield-alt text-success me-3 mt-1"></i>
+                                <div>
+                                    <h6>Secure Sharing</h6>
+                                    <p class="text-muted mb-0">All files are scanned and stored securely with verified uploads.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-users text-info me-3 mt-1"></i>
+                                <div>
+                                    <h6>Community Driven</h6>
+                                    <p class="text-muted mb-0">User ratings, reviews, and feedback help maintain quality.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-bolt text-warning me-3 mt-1"></i>
+                                <div>
+                                    <h6>Fast Downloads</h6>
+                                    <p class="text-muted mb-0">Optimized servers ensure quick and reliable file downloads.</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="d-flex align-items-start">
+                                <i class="fas fa-mobile-alt text-primary me-3 mt-1"></i>
+                                <div>
+                                    <h6>Mobile Friendly</h6>
+                                    <p class="text-muted mb-0">Access your files anywhere with our responsive design.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Community Guidelines -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-gavel me-2 text-danger"></i>
+                        Community Guidelines
+                    </h3>
+                    <div class="alert alert-info">
+                        <p class="mb-2"><strong>To maintain a safe and respectful environment, we require all members to:</strong></p>
+                        <ul class="mb-0">
+                            <li>Only upload files you have the right to share</li>
+                            <li>Provide accurate descriptions and categorization</li>
+                            <li>Respect intellectual property rights</li>
+                            <li>Report any inappropriate content</li>
+                            <li>Be respectful in reviews and comments</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Technology Stack -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h3 class="card-title">
+                        <i class="fas fa-code me-2 text-secondary"></i>
+                        Built With
+                    </h3>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fab fa-python me-2 text-primary"></i>Django Framework</li>
+                                <li><i class="fas fa-database me-2 text-success"></i>SQLite Database</li>
+                                <li><i class="fas fa-envelope me-2 text-info"></i>Email Verification</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fab fa-bootstrap me-2 text-purple"></i>Bootstrap CSS</li>
+                                <li><i class="fas fa-shield-alt me-2 text-warning"></i>Secure Authentication</li>
+                                <li><i class="fas fa-mobile-alt me-2 text-danger"></i>Responsive Design</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Section -->
+            <div class="card">
+                <div class="card-body text-center">
+                    <h3 class="card-title">
+                        <i class="fas fa-heart me-2 text-danger"></i>
+                        Join Our Community
+                    </h3>
+                    <p class="card-text">
+                        Whether you're a developer sharing your latest app, a musician distributing your tracks, 
+                        or someone looking for quality content, Community Files is here for you.
+                    </p>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-center">
+                        <a href="{% url 'upload' %}" class="btn btn-primary">
+                            <i class="fas fa-upload me-2"></i>
+                            Start Sharing
+                        </a>
+                        <a href="{% url 'downloads' %}" class="btn btn-outline-primary">
+                            <i class="fas fa-download me-2"></i>
+                            Browse Files
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
