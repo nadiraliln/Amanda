@@ -1,75 +1,15 @@
-from django.shortcuts import render, redirect,get_object_or_404
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
 from django.contrib.auth.decorators import login_required
-from .models import File  # Tumhare uploaded files model ka naam example hai
-from django.contrib.auth.models import User
+from django.contrib.auth import get_user_model
 from django.http import FileResponse
-import random
 from django.conf import settings
 from django.core.mail import send_mail
-from django.contrib import messages
-# views.py
-from django.contrib.auth import get_user_model
+import random
 
+from .models import File
 
-@login_required
-def download_file(request, file_id):
-    file = get_object_or_404(File, pk=file_id)
-    file.download_count += 1
-    file.save()
-    response = FileResponse(file.file.open('rb'))
-    response['Content-Disposition'] = f'attachment; filename="{file.original_filename}"'
-    return response
-
-# Home Page
-@login_required
-def home(request):
-    return render(request, 'index.html')
-
-def upload(request):
-    return render(request, 'upload.html')
-
-# About Page
-@login_required
-def about(request):
-    return render(request, 'about.html')
-
-# Contact Page
-@login_required
-def contact(request):
-    if request.method == 'POST':
-        name = request.POST.get('name')
-        email = request.POST.get('email')
-        subject = request.POST.get('subject')
-        message = request.POST.get('message')
-
-        # Example: Save to database or send email logic yahan hoga
-        messages.success(request, 'Thank you for your message! We will get back to you soon.')
-
-        return redirect('contact')
-
-    return render(request, 'contact.html')
-
-# Downloads Page
-@login_required
-def downloads(request):
-    files = File.objects.all()
-    context = {
-        'files': files
-    }
-    return render(request, 'downloads.html', context)
-
-# File Detail Page
-@login_required
-def file_detail(request, file_id):
-    file = File.objects.get(id=file_id)
-    context = {
-        'file': file
-    }
-    return render(request, 'file_detail.html', context)
-
-# Register
 User = get_user_model()
 
 # ✅ OTP generate
@@ -82,18 +22,25 @@ def send_otp_email(email, otp):
     message = f'Your OTP code is: {otp}'
     from_email = settings.DEFAULT_FROM_EMAIL
     recipient_list = [email]
-
     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
-# ✅ Register view (safe)
+# ✅ Register
 def register(request):
     if request.method == 'POST':
         name = request.POST.get('name')
         username = request.POST.get('username')
         email = request.POST.get('email')
         password = request.POST.get('password')
-        phone = request.POST.get('phone')
-        address = request.POST.get('address')
+        confirm_password = request.POST.get('confirm_password')
+        profile = request.FILES.get('profile_picture')
+
+        if not all([name, username, email, password, confirm_password]):
+            messages.error(request, 'All fields are required.')
+            return redirect('register')
+
+        if password != confirm_password:
+            messages.error(request, 'Passwords do not match.')
+            return redirect('register')
 
         if User.objects.filter(username=username).exists():
             messages.error(request, 'Username already taken.')
@@ -103,13 +50,14 @@ def register(request):
             messages.error(request, 'Email already registered.')
             return redirect('register')
 
-        user = User.objects.create_user(
+        user = User(
+            full_name=name,
             username=username,
             email=email,
-            password=password,
-            first_name=name
+            profile_picture=profile
         )
-        user.is_active = False   # ✅ Important for verification
+        user.set_password(password)
+        user.is_active = False
         user.save()
 
         otp = generate_otp()
@@ -123,7 +71,7 @@ def register(request):
 
     return render(request, 'register.html')
 
-# ✅ Verify email view
+# ✅ Verify email
 def verify_email(request):
     email = request.session.get('verification_email')
     if not email:
@@ -138,7 +86,6 @@ def verify_email(request):
             try:
                 user = User.objects.get(email=email)
                 user.is_active = True
-                # If you have email_verified field, set it True here too
                 if hasattr(user, 'email_verified'):
                     user.email_verified = True
                 user.save()
@@ -157,7 +104,7 @@ def verify_email(request):
 
     return render(request, 'verify_email.html', {'email': email})
 
-# ✅ Resend OTP view
+# ✅ Resend OTP
 def resend_otp(request):
     email = request.session.get('verification_email')
     if email:
@@ -168,7 +115,8 @@ def resend_otp(request):
         return redirect('verify_email')
     messages.error(request, 'No email to resend OTP to.')
     return redirect('home')
-# Login
+
+# ✅ Login
 def login(request):
     if request.method == 'POST':
         email = request.POST.get('email')
@@ -176,12 +124,11 @@ def login(request):
 
         try:
             user = User.objects.get(email=email)
-            username = user.username
         except User.DoesNotExist:
             messages.error(request, 'Invalid email or password.')
             return redirect('login')
 
-        user = authenticate(request, username=username, password=password)
+        user = authenticate(request, username=user.username, password=password)
         if user is not None:
             auth_login(request, user)
             messages.success(request, 'Login successful!')
@@ -192,14 +139,14 @@ def login(request):
 
     return render(request, 'login.html')
 
-# Logout
+# ✅ Logout
 @login_required
 def logout(request):
     auth_logout(request)
     messages.info(request, 'Logged out successfully.')
     return redirect('login')
 
-
+# ✅ Profile
 @login_required
 def profile(request):
     user = request.user
@@ -216,3 +163,49 @@ def profile(request):
     }
 
     return render(request, 'profile.html', context)
+
+# ✅ File Download
+@login_required
+def download_file(request, file_id):
+    file = get_object_or_404(File, pk=file_id)
+    file.download_count += 1
+    file.save()
+    response = FileResponse(file.file.open('rb'))
+    response['Content-Disposition'] = f'attachment; filename="{file.original_filename}"'
+    return response
+
+# ✅ Home Page
+@login_required
+def home(request):
+    return render(request, 'index.html')
+
+# ✅ Upload Page
+@login_required
+def upload(request):
+    return render(request, 'upload.html')
+
+# ✅ About Page
+@login_required
+def about(request):
+    return render(request, 'about.html')
+
+# ✅ Contact Page
+@login_required
+def contact(request):
+    if request.method == 'POST':
+        # Handle contact form submission
+        messages.success(request, 'Thank you for your message! We will get back to you soon.')
+        return redirect('contact')
+    return render(request, 'contact.html')
+
+# ✅ Downloads Page
+@login_required
+def downloads(request):
+    files = File.objects.all()
+    return render(request, 'downloads.html', {'files': files})
+
+# ✅ File Detail
+@login_required
+def file_detail(request, file_id):
+    file = get_object_or_404(File, id=file_id)
+    return render(request, 'file_detail.html', {'file': file})

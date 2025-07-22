@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import File, FileReview
+from .models import File, FileReview, Category
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
@@ -11,3 +11,6 @@ class FileAdmin(admin.ModelAdmin):
 class FileReviewAdmin(admin.ModelAdmin):
     list_display = ('file', 'user', 'rating', 'created_at')
     search_fields = ('file__title', 'user__username')
+    
+    
+admin.site.register(Category)

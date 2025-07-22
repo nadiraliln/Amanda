@@ -51,6 +51,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'turninto.urls'
+AUTH_USER_MODEL = 'core.UserRegister'
 
 TEMPLATES = [
     {
